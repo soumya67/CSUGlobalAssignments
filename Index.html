@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLP Chatbot</title>
+</head>
+<body>
+    <h1>NLP Chatbot</h1>
+    <form id="chat-form">
+        <label for="context">Context:</label><br>
+        <textarea id="context" name="context" rows="4" cols="50"></textarea><br><br>
+        <label for="question">Question:</label><br>
+        <textarea id="question" name="question" rows="2" cols="50"></textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <h2>Response</h2>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('chat-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const context = document.getElementById('context').value;
+            const question = document.getElementById('question').value;
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ context, question })
+            });
+
+            const data = await response.json();
+            document.getElementById('response').innerHTML = `
+                <p><strong>Answer:</strong> ${data.answer}</p>
+                <p><strong>Sentiment:</strong> ${data.sentiment.label} (Score: ${data.sentiment.score})</p>
+                <p><strong>POS Tags:</strong> ${data.pos_tags.map(tag => `${tag[0]} (${tag[1]})`).join(', ')}</p>
+                <p><strong>Classification:</strong> ${data.classification}</p>
+            `;
+        });
+    </script>
+</body>
+</html>
